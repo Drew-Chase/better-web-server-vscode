@@ -3,7 +3,7 @@ import { start as createServer, stop } from '../server/server';
 import { status } from '../server/status'
 import { update as updateStatusbar } from './statusbar';
 import { running, reload } from '../server/server';
-import {updateFile, getWorkspaceCacheDirectory} from '../server/filesystem';
+import { updateFile, getWorkspaceCacheDirectory } from '../server/filesystem';
 
 export function register(context: vscode.ExtensionContext) {
     let workspace: string | null = null;
@@ -13,16 +13,16 @@ export function register(context: vscode.ExtensionContext) {
         updateStatusbar(status.INVALID);
     }
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-		if(running && workspace)
-		{
-			updateFile(document.fileName, workspace).then(()=>{
+        if (running && workspace) {
+            updateFile(document.fileName, workspace).then(() => {
                 reload()
             })
-		}
-	}))
+        }
+    }))
+
     context.subscriptions.push(vscode.commands.registerCommand('better-web-server.start-server', () => {
         if (workspace) {
-            createServer("D:\\XAMPP\\php\\php.exe", 4466, workspace);
+            createServer(workspace);
         } else {
             vscode.window.showErrorMessage("Unable to create ")
         }

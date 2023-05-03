@@ -1,5 +1,5 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
-import { window } from "vscode";
+import { window, workspace } from "vscode";
 import { outputChannel } from "../extension";
 import open from 'open';
 import { status } from './status'
@@ -18,20 +18,28 @@ let url: string;
  * @param port The port number to listen on.
  * @param working_directory The working directory of the PHP process.
  */
-export async function start(php_path: string, port: number, working_directory: string) {
+export async function start(working_directory: string) {
     if (running) {
         window.showErrorMessage(`Server is already running`);
         return;
     }
 
+    let port: number = <number>workspace.getConfiguration().get("better-web-server.serverPort");
+
     update(status.LOADING);
+
+    if (!workspace.getConfiguration().get("better-web-server.phpPath")) {
+        window.showErrorMessage(`PHP Path is not valid!`);
+        update(status.READY);
+        return;
+    }
 
     try {
         await copyWorkspace(working_directory);
         url = `http://127.0.0.1:${port}`;
 
         // Spawn a PHP process to start the server.
-        currentServer = spawn(php_path, ['-S', `127.0.0.1:${port}`, '-t', getWorkspaceCacheDirectory(working_directory)], { cwd: getWorkspaceCacheDirectory(working_directory) });
+        currentServer = spawn(<string>workspace.getConfiguration().get("better-web-server.phpPath"), ['-S', `127.0.0.1:${port}`, '-t', getWorkspaceCacheDirectory(working_directory)], { cwd: getWorkspaceCacheDirectory(working_directory) });
         running = true;
 
         // Show a message and open the server URL in the default browser.

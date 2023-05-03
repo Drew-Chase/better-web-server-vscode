@@ -26,7 +26,25 @@
         "command": "better-web-server.stop-server",
         "title": "Better Web Server: Stop Server"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Better Web Server",
+      "properties": {
+        "better-web-server.phpPath": {
+          "title": "PHP Executable Path",
+          "type": "string",
+          "default": "",
+          "markdownDescription": "The path to the php executable. **/path/to/php.exe**    \nDownload php versions: [here](https://www.php.net/downloads.php)"
+
+        },
+        "better-web-server.serverPort": {
+          "title": "Server Port",
+          "type": "integer",
+          "default": 5000,
+          "description": "The server port"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
