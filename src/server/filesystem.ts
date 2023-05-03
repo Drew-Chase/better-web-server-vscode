@@ -12,7 +12,9 @@ export async function copyWorkspace(workspace: string) {
     outputChannel.appendLine('Copying to cache directory');
     await fs.promises.mkdir(workspaceCache, { recursive: true });
     await copyDir(workspace, workspaceCache);
-    await copyDir(path.join(__dirname, "injects"), path.join(workspaceCache), false)
+    let injects = path.join(workspaceCache, 'injects');
+    await fs.promises.mkdir(injects, { recursive: true });
+    await copyDir(path.join(__dirname, "injects"), injects, false)
 }
 
 async function copyDir(src: string, dest: string, inject: boolean = true) {
@@ -71,7 +73,7 @@ async function injectReloadScript(filePath: string): Promise<string> {
     const $ = cheerio.load(content);
     const phpScriptRegex = /<\?php[\s\S]*?\?>\s*$/m;
     if (phpScriptRegex.test(content)) {
-        $('body').append('<script src="/live-reload.min.js"></script>');
+        $('body').append('<script src="/injects/live-reload.min.js"></script>');
     }
     return $.html();
 }
