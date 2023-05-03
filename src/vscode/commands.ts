@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { start as createServer, stop } from '../server/server';
 import { status } from '../server/status'
 import { update as updateStatusbar } from './statusbar';
-import { running, navigate } from '../server/server';
+import { running, reload } from '../server/server';
 import {updateFile, getWorkspaceCacheDirectory} from '../server/filesystem';
 
 export function register(context: vscode.ExtensionContext) {
@@ -16,7 +16,7 @@ export function register(context: vscode.ExtensionContext) {
 		if(running && workspace)
 		{
 			updateFile(document.fileName, workspace).then(()=>{
-                navigate(null, true)
+                reload()
             })
 		}
 	}))
