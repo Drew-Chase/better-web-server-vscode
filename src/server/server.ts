@@ -5,7 +5,8 @@ import open from 'open';
 import { status } from './status'
 import { update } from '../vscode/statusbar'
 import { copyWorkspace, getWorkspaceCacheDirectory } from "./filesystem";
-import axios from 'axios';
+import fetch, { FormData } from 'node-fetch';
+
 
 let currentServer: ChildProcessWithoutNullStreams | undefined;
 export let running: boolean = false;
@@ -59,7 +60,6 @@ export async function start(php_path: string, port: number, working_directory: s
 
         // Update the status bar to show that the server is running.
         update(status.RUNNING, url);
-        navigate(url, false);
     } catch (error) {
         window.showErrorMessage(`Failed to start server: ${error}`);
         update(status.READY);
@@ -89,18 +89,21 @@ export function stop() {
  * @param newUrl The URL to navigate to.
  * @param reload Whether to reload the page.
  */
-export async function navigate(newUrl: string | null, reload: boolean): Promise<void> {
-    if (!running)
+export async function reload(): Promise<void> {
+    if (!running) {
         return;
-    if (!newUrl)
-        newUrl = url;
+    }
+
     try {
-        // Make an HTTP POST request to the server to navigate to the new URL.
-        await axios.post(`${url}/injects/live-reload.php`, {
-            url: newUrl,
-            reload: reload
+        let data = new FormData()
+        data.append("reload", true)
+        let response = await fetch(`${url}/injects/live-reload.php`, {
+            method: 'POST',
+            body: data
         });
+        outputChannel.appendLine("Refreshing page!")
+
     } catch (error) {
-        console.error(error);
+        window.showErrorMessage(`Unable to reload page: ${error}`)
     }
 }
